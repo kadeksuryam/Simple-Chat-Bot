@@ -1,4 +1,5 @@
 import React from 'react'
+import axios from 'axios'
 import { Chat } from '@progress/kendo-react-conversational-ui';
 import '@progress/kendo-theme-material/dist/all.css';
 import './app.css'
@@ -27,8 +28,13 @@ class App extends React.Component {
                   timestamp: new Date(),
                   text: "Hello, this is a demo bot. I don't do much, but I can count symbols!"
               }
-          ]
+          ],
+          time : 0
       };
+  }
+
+  componentDidMount() {
+    this.fetchTime();
   }
 
   addNewMessage = (event) => {
@@ -57,9 +63,16 @@ class App extends React.Component {
       return answer;
   }
 
+  fetchTime = async () => {
+      const realTime = await axios.get('/api/time');
+      this.setState({time : realTime.data.time});
+    //   console.log(realTime);
+  }
+
   render() {
       return (
         <div>
+          <p>Real Time Now : {this.state.time} </p>
           <Chat className="chat-container" user={this.user}
             messages={this.state.messages}
             onMessageSend={this.addNewMessage}
