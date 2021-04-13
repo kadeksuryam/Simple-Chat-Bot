@@ -3,6 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@progress/kendo-licensing": "^1.1.4",
+    "@progress/kendo-react-buttons": "^4.5.0",
+    "@progress/kendo-react-conversational-ui": "^4.5.0",
+    "@progress/kendo-react-intl": "^4.5.0",
+    "@progress/kendo-theme-material": "^3.31.1",
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
