@@ -3,6 +3,11 @@ import axios from 'axios'
 import { Chat } from '@progress/kendo-react-conversational-ui';
 import '@progress/kendo-theme-material/dist/all.css';
 import './app.css'
+import { BrowserRouter as Router,
+    Route,
+    Switch } from "react-router-dom"
+import Navbar from './components/Navbar';
+import About from './components/About'
 
 class App extends React.Component {
   constructor(props) {
@@ -11,7 +16,7 @@ class App extends React.Component {
           id: 1,
           avatarUrl: "https://via.placeholder.com/24/008000/008000.png"
       };
-      this.bot = { id: 0 };
+      this.bot = { id: 0, avatarUrl: "https://ih0.redbubble.net/image.704526441.8813/flat,1000x1000,075,f.jpg" };
       this.state = {
           messages: [
               {
@@ -38,9 +43,18 @@ class App extends React.Component {
   }
 
   addNewMessage = (event) => {
-      let botResponce = Object.assign({}, event.message);
-      botResponce.text = this.countReplayLength(event.message.text);
-      botResponce.author = this.bot;
+      let botResponse = Object.assign({}, event.message);
+      botResponse.text = this.countReplayLength(event.message.text);
+      botResponse.author = this.bot;
+      botResponse.suggestedActions = [
+        {
+            type: 'reply',
+            value: 'Oh, really?'
+        }, {
+            type: 'reply',
+            value: 'Thanks, but this is boring.'
+        }
+    ]
       this.setState((prevState) => ({
           messages: [
               ...prevState.messages,
@@ -51,11 +65,17 @@ class App extends React.Component {
           this.setState(prevState => ({
               messages: [
                   ...prevState.messages,
-                  botResponce
+                  botResponse
               ]
           }));
       }, 1000);
   };
+
+  getResponse = async (req_msg) => {
+     // Respon berbentuk JSON : { "timestamp: ", "data" : {"res_message": "", "res_suggestion" : ["", ""]}}
+     let res = await axios.post('/api', {"message" : req_msg})
+     return res
+  }
 
   countReplayLength = (question) => {
       let length = question.length;
@@ -72,11 +92,20 @@ class App extends React.Component {
   render() {
       return (
         <div>
-          <p>Real Time Now : {this.state.time} </p>
-          <Chat className="chat-container" user={this.user}
-            messages={this.state.messages}
-            onMessageSend={this.addNewMessage}
-            placeholder={"Type a message..."}/>
+          <Router>
+              <Navbar/>
+              <Switch>
+                  <Route path="/about">
+                    <About />
+                  </Route>
+                  <Route path="/">
+                    <Chat className="chat-container" user={this.user}
+                messages={this.state.messages}
+                onMessageSend={this.addNewMessage}
+                placeholder={"Masukkan suatu perintah..."}/>
+                  </Route>
+              </Switch>
+          </Router>
         </div>
       );
   }

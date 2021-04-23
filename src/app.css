@@ -1,5 +1,6 @@
 .chat-container{
-    margin: 5rem 40%;
-    height : 45rem;
-    width : 25rem
+    margin-top: 5rem;
+    display: flex;
+    width:auto;
+    height: 70vh;
 }
