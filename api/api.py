@@ -1,9 +1,12 @@
 import time, json
 from flask import Flask
 from flask import request
+import sys, os.path
+dir_cmd = (os.path.abspath(os.path.join(os.path.dirname(__file__), '')))
+sys.path.append(dir_cmd)
 from commandHandler import *
 
-app = Flask(__name__, static_folder='../build', static_url_path='')
+app = Flask(__name__, static_folder='../build', static_url_path='/')
 
 @app.route('/', methods=["GET"])
 def index():
