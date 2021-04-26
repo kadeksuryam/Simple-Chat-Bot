@@ -24,14 +24,11 @@ class App extends React.Component {
                   suggestedActions: [
                       {
                           type: 'reply',
-                          value: 'Oh, really?'
-                      }, {
-                          type: 'reply',
-                          value: 'Thanks, but this is boring.'
+                          value: 'What can you do?'
                       }
                   ],
                   timestamp: new Date(),
-                  text: "Hello, this is a demo bot. I don't do much, but I can count symbols!"
+                  text: "Hello, my name is Hayacaka <3 I'm a Deadline Remainder Assistant, よろしくお願いします!"
               }
           ],
           time : 0
@@ -42,19 +39,11 @@ class App extends React.Component {
     this.fetchTime();
   }
 
-  addNewMessage = (event) => {
+  addNewMessage = async (event) => {
       let botResponse = Object.assign({}, event.message);
-      botResponse.text = this.countReplayLength(event.message.text);
+      let serverRes = await this.getResponse(event.message.text);
+      botResponse.text = serverRes.res_msg
       botResponse.author = this.bot;
-      botResponse.suggestedActions = [
-        {
-            type: 'reply',
-            value: 'Oh, really?'
-        }, {
-            type: 'reply',
-            value: 'Thanks, but this is boring.'
-        }
-    ]
       this.setState((prevState) => ({
           messages: [
               ...prevState.messages,
@@ -74,7 +63,7 @@ class App extends React.Component {
   getResponse = async (req_msg) => {
      // Respon berbentuk JSON : { "timestamp: ", "data" : {"res_message": "", "res_suggestion" : ["", ""]}}
      let res = await axios.post('/api', {"message" : req_msg})
-     return res
+     return {timestamp: res.data.timestamp, res_msg: res.data.res_msg, res_msg_sgt: res.data.res_msg_sgt}
   }
 
   countReplayLength = (question) => {
