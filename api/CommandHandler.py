@@ -127,7 +127,7 @@ class CommandHandler:
         k2 = re.search(r"bisa", self.reqMessage, flags=re.IGNORECASE)
         
         if(k1 and k2):
-            resMsg = "[Fitur]\n1. Menambahkan task baru\n2. Melihat daftar task\n3. Menampilkan deadline dari suatu task tertentu\n4. Memperbaharui task tertentu\n5. Menandai suatu task telah selesai dikerjakan\n6. Menampilkan opsi help\n"
+            resMsg = "\n[Fitur]\n1. Menambahkan task baru\n2. Melihat daftar task\n3. Menampilkan deadline dari suatu task tertentu\n4. Memperbaharui task tertentu\n5. Menandai suatu task telah selesai dikerjakan\n6. Menampilkan opsi help\n"
             resMsg += "\n[Daftar kata penting]\n"
             
             it_kata = 0
@@ -145,19 +145,20 @@ class CommandHandler:
         typoWord = []
         
         for i in range(0, len(reqMsgSplit)):
-            for j in range(0, len(self.kata_penting)):
-                kataPenting_len = len(self.kata_penting[j])
-                reqMsgSplit_i_len = len(reqMsgSplit[i])
+            for listOfKeyword in self.kata_penting, self.kata_perbarui, self.kata_petunjuk_waktu:
+                for keyword in listOfKeyword:
+                    kataPenting_len = len(keyword)
+                    reqMsgSplit_i_len = len(reqMsgSplit[i])
 
-                kemiripan = max(0, 1-levenshteinDistance(reqMsgSplit[i], self.kata_penting[j])/(max(reqMsgSplit_i_len, kataPenting_len)))
+                    kemiripan = max(0, 1-levenshteinDistance(reqMsgSplit[i], keyword)/(max(reqMsgSplit_i_len, kataPenting_len)))
+                    print(keyword)
+                    if(kemiripan*100 > 75 and kemiripan != 1):
+                        reqMsgSplit[i] = keyword
+                        typoWord.append(keyword)
+                        break
 
-                if(kemiripan*100 > 75 and kemiripan != 1):
-                    reqMsgSplit[i] = self.kata_penting[j]
-                    typoWord.append(self.kata_penting[j])
-                    break
-        
         self.typoWord = typoWord
-        if(len(self.typoWord) != 0): self.resMessage = "Mungkin maksud kamu: " + ' '.join(reqMsgSplit)
+        if(len(self.typoWord) != 0): self.resMessage = "Mungkin maksud kamu: \n" + ' '.join(reqMsgSplit)
         else: self.resMessage = ""
         
     def getTaskRecorded(self):
@@ -289,7 +290,7 @@ def handleMessage(message):
     c.helpCmd()
     c.renewTask()
     c.getTaskRecorded()
-    return c.resMessage
+    return datetime.datetime.now(), c.resMessage, c.typoWord
 
 if __name__ == "__main__":
     #Untuk testing
