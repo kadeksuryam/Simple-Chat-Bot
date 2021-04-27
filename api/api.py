@@ -4,7 +4,7 @@ from flask import request
 import sys, os.path
 dir_cmd = (os.path.abspath(os.path.join(os.path.dirname(__file__), '')))
 sys.path.append(dir_cmd)
-from commandHandler import *
+from CommandHandler import handleMessage
 
 app = Flask(__name__, static_folder='../build', static_url_path='/')
 
@@ -17,9 +17,11 @@ def process_req():
     # Respon berbentuk JSON : { "timestamp: ", "data" : {"res_msg": "", "res_msg_sgt" : ["", ""]}}
     # Request berbentuk JSON : { "message" : ""}
     req = json.loads(request.data)
-    timestamp, resMsg, sgtMsg = handleCommand(req["message"])
+    timestamp, resMsg, typoWord = handleMessage(req["message"])
 
-    res = { "timestamp" : timestamp, "res_msg" : resMsg, "res_msg_sgt" : sgtMsg }
+    if(resMsg == ""): resMsg = "Maaf, pesan tidak dikenali"
+
+    res = { "timestamp" : timestamp, "res_msg" : resMsg, "typoWord" : typoWord}
 
     return res
 
