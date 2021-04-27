@@ -53,6 +53,31 @@ class CommandHandler:
         else:
             return False
 
+    def levenshteinDistance(self, src, dst):
+        # Dynamic Programming, Bottom Up
+        # d[i][j], adalah jarak levenshtein dengan prefix src ke i dan prefix dst ke j
+        n = len(src)
+        m = len(dst)
+        d = [[0 for j in range(m+1)] for i in range(n+1)]
+        
+        #Kasus Base
+        # kasus ketika src = "", berarti costnya = jumlah insert semua karakter dst ke src
+        for j in range(m+1): d[0][j] = j
+
+        #kasus ketika dst = "", berarti costnya = jumlah delete semua karakter src
+        for i in range(n+1): d[i][0] = i
+
+        #Kasus Transitional
+        for i in range(1, len(src)+1):
+            for j in range(1, len(dst)+1):
+                if(i == j):
+                    sub_cost = 0
+                else:
+                    sub_cost = 1
+                # Insert/delete/substitusi
+                d[i][j] = min(d[i][j-1]+1, min(d[i-1][j]+1, d[i-1][j-1]+sub_cost))
+        
+        return d[n][m]
 
 def handleMessage(message):
     c = CommandHandler(message)
@@ -62,11 +87,13 @@ def handleMessage(message):
     return c.resMessage
 
 if __name__ == "__main__":
-    #Untuk testing
-    reqMessage = "Apa yang bisa assistant bisa lakukan"
-    resMessage = handleMessage(reqMessage)
-    if(resMessage):
-        print(resMessage)
-    else:
-        print("Maaf, pesan tidak dikenali")
+    # #Untuk testing
+    # reqMessage = "Apa yang bisa assistant bisa lakukan"
+    # resMessage = handleMessage(reqMessage)
+    # if(resMessage):
+    #     print(resMessage)
+    # else:
+    #     print("Maaf, pesan tidak dikenali")
 
+    c = CommandHandler("")
+    print(c.levenshteinDistance("d", ""))
