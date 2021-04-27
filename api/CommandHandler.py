@@ -146,6 +146,36 @@ class CommandHandler:
         else:
             return False
 
+    def getTaskRecorded(self):
+        msg = self.reqMessage.lower()
+        rkey = r"^(?=.*\bapa\b)"
+        key1 = ""
+        key1 += rkey +r"(?=.*\b({})\b).*".format("deadline") 
+        for i in self.kata_penting:
+            key1 += r"|"+ rkey + r"(?=.*\b({})\b).*".format(i)
+        key1 +=r"$"
+        kata_kunci1 = re.findall(key1,msg)
+        if (len(kata_kunci1)==0): return "",False
+        key2 = r"\b(hari ini)\b|\b(sejauh ini)\b|(\d{2}\/\d{2}\/\d{4})\b \w+ (\d{2}\/\d{2}\/\d{4}\b)|\b(\d+)\b \b(\w+)\b ke depan"
+        kata_kunci2 = re.findall(key2,msg)
+        if (len(kata_kunci2)==0): return "",False
+        kata_kunci1 = [x!="" for x in kata_kunci1]
+        with open('database.csv', 'r') as fileDB:
+            db_reader = csv.reader(fileDB, delimiter=',')
+            retmsg = "[{}]\n".format("Daftar Deadline")
+            if(kata_kunci2[0]!=""):
+                today = datetime.datetime.now().strftime("%d/%m/%Y")
+                for i in db_reader:
+                    if(i[1] == today):
+                        retmsg += "(ID: {}) {} - {} - {}".format(i[0],i[1],i[2],i[3]) + "\n"               
+                return retmsg, True 
+            elif(kata_kunci2[1]!=""):
+                return retmsg
+            elif(kata_kunci2[2]!=""):
+                return retmsg
+            else:
+                return retmsg        
+
 def lastOccurence(string):
     loc = [-1 for i in range(128)]
     for i in range(len(string)):
@@ -169,13 +199,12 @@ def boyerMooreMatch(text, pattern):
                 j = m - 1
         return -1
 
-
 def handleMessage(message):
     c = CommandHandler(message)
     c.addTaskCmd()
     c.helpCmd()
     c.renewTask()
-
+    c.getTaskRecorded()
     return c.resMessage
 
 if __name__ == "__main__":
