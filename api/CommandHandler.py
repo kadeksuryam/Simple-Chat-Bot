@@ -10,7 +10,8 @@ class CommandHandler:
     def __init__(self, message):
         self.reqMessage = message
         self.resMessage = ""
-        self.kata_penting = ["kuis", "ujian", "tucil", "tubes", "praktikum"]
+        self.kata_penting = ["kuis", "ujian", "tucil", "tubes", "praktikum", "deadline"]
+        self.typoWord= []
         self.initRegexKataPenting()
         
     def addTaskCmd(self):
@@ -55,37 +56,23 @@ class CommandHandler:
 
     def checkMsgTypo(self):
         reqMsgSplit = self.reqMessage.split()
+        typoWord = []
         
-        for word in reqMsgSplit:
-            for kataPenting in self.kata_penting:
-                # tingkat kemiripan > 15%
-                if(self.levenshteinDistance(word, kata))
+        for i in range(0, len(reqMsgSplit)):
+            for j in range(0, len(self.kata_penting)):
+                kataPenting_len = len(self.kata_penting[j])
+                reqMsgSplit_i_len = len(reqMsgSplit[i])
 
-    def levenshteinDistance(self, src, dst):
-        # Dynamic Programming, Bottom Up
-        # d[i][j], adalah jarak levenshtein dengan prefix src ke i dan prefix dst ke j
-        n = len(src)
-        m = len(dst)
-        d = [[0 for j in range(m+1)] for i in range(n+1)]
+                kemiripan = max(0, 1-levenshteinDistance(reqMsgSplit[i], self.kata_penting[j])/(max(reqMsgSplit_i_len, kataPenting_len)))
+
+                if(kemiripan*100 > 75 and kemiripan != 1):
+                    reqMsgSplit[i] = self.kata_penting[j]
+                    typoWord.append(self.kata_penting[j])
+                    break
         
-        #Kasus Base
-        # kasus ketika src = "", berarti costnya = jumlah insert semua karakter dst ke src
-        for j in range(m+1): d[0][j] = j
-
-        #kasus ketika dst = "", berarti costnya = jumlah delete semua karakter src
-        for i in range(n+1): d[i][0] = i
-
-        #Kasus Transitional
-        for i in range(1, len(src)+1):
-            for j in range(1, len(dst)+1):
-                if(i == j):
-                    sub_cost = 0
-                else:
-                    sub_cost = 1
-                # Insert/delete/substitusi
-                d[i][j] = min(d[i][j-1]+1, min(d[i-1][j]+1, d[i-1][j-1]+sub_cost))
-        
-        return d[n][m]
+        self.typoWord = typoWord
+        if(len(self.typoWord) != 0): self.resMessage = "Mungkin maksud kamu: " + ' '.join(reqMsgSplit)
+        else: self.resMessage = ""
         
     def getTaskRecorded(self):
         msg = self.reqMessage.lower()
@@ -117,13 +104,41 @@ class CommandHandler:
             else:
                 return retmsg
 
+
+def levenshteinDistance(src, dst):
+    # Dynamic Programming, Bottom Up
+    # d[i][j], adalah jarak levenshtein dengan prefix src ke i dan prefix dst ke j
+    n = len(src)
+    m = len(dst)
+    d = [[0 for j in range(m+1)] for i in range(n+1)]
+    
+    #Kasus Base
+    # kasus ketika src = "", berarti costnya = jumlah insert semua karakter dst ke src
+    for j in range(m+1): d[0][j] = j
+
+    #kasus ketika dst = "", berarti costnya = jumlah delete semua karakter src
+    for i in range(n+1): d[i][0] = i
+
+    #Kasus Transitional
+    for i in range(1, len(src)+1):
+        for j in range(1, len(dst)+1):
+            if(src[i-1] == dst[j-1]):
+                sub_cost = 0
+            else:
+                sub_cost = 1
+            # Insert/delete/substitusi
+            d[i][j] = min(d[i][j-1]+1, min(d[i-1][j]+1, d[i-1][j-1]+sub_cost))
+    
+    return d[n][m]
+
 def handleMessage(message):
     c = CommandHandler(message)
+    c.checkMsgTypo()
     c.addTaskCmd()
     c.helpCmd()
     c.getTaskRecorded()
 
-    return c.resMessage
+    return c.resMessage, c.typoWord
 
 if __name__ == "__main__":
     # #Untuk testing
@@ -134,5 +149,6 @@ if __name__ == "__main__":
     # else:
     #     print("Maaf, pesan tidak dikenali")
 
-    c = CommandHandler("")
-    print(c.levenshteinDistance("d", ""))
+    res, typoWord = handleMessage("Apa saja dedline yang ada sejauh ini?")
+    print(res)
+    print(typoWord)

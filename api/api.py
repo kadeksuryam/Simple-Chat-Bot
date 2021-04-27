@@ -19,7 +19,7 @@ def process_req():
     req = json.loads(request.data)
     timestamp, resMsg, sgtMsg = handleCommand(req["message"])
 
-    res = { "timestamp" : timestamp, "res_msg" : resMsg, "res_msg_sgt" : sgtMsg }
+    res = { "timestamp" : timestamp, "res_msg" : resMsg, "res_msg_sgt" : {"msg_words" : "", "msg_sgt_words" : ""}}
 
     return res
 
