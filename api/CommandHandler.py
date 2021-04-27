@@ -66,22 +66,69 @@ class CommandHandler:
         key2 = r"\b(hari ini)\b|\b(sejauh ini)\b|(\d{2}\/\d{2}\/\d{4})\b \w+ (\d{2}\/\d{2}\/\d{4}\b)|\b(\d+)\b \b(\w+)\b ke depan"
         kata_kunci2 = re.findall(key2,msg)
         if (len(kata_kunci2)==0): return "",False
-        kata_kunci1 = [x!="" for x in kata_kunci1]
+        kata_kunci1 = [x for x in kata_kunci1[0] if x!=""]
+        kata_kunci2 = kata_kunci2[0]
         with open('database.csv', 'r') as fileDB:
             db_reader = csv.reader(fileDB, delimiter=',')
-            retmsg = "[{}]\n".format("Daftar Deadline")
+            next(db_reader, None)
+            msgformat = "(ID: {}) {} - {} - {} - {}"
+            retmsg = "[{}]".format("Daftar Deadline")
+            today = datetime.datetime.now().strftime("%d/%m/%Y")
             if(kata_kunci2[0]!=""):
-                today = datetime.datetime.now().strftime("%d/%m/%Y")
                 for i in db_reader:
-                    if(i[1] == today):
-                        retmsg += "(ID: {}) {} - {} - {}".format(i[0],i[1],i[2],i[3]) + "\n"               
-                return retmsg, True 
+                    if(i[2] == today and kata_kunci1[0] == "deadline" and i[5]=="0"):
+                        retmsg += "\n"
+                        retmsg += msgformat.format(i[0],i[1],i[2],i[3], i[4])
+                    elif(i[2] == today and kata_kunci1[0] == i[3] and i[5]=="0"):
+                        retmsg += "\n"
+                        retmsg += msgformat.format(i[0],i[1],i[2],i[3], i[4])
+                    else:
+                        continue
             elif(kata_kunci2[1]!=""):
-                return retmsg
-            elif(kata_kunci2[2]!=""):
-                return retmsg
+                for i in db_reader:
+                    if(kata_kunci1[0] == "deadline" and i[5]=="0"):
+                        retmsg += "\n"
+                        retmsg += msgformat.format(i[0],i[1],i[2],i[3], i[4])
+                    elif(kata_kunci1[0] == i[3] and i[5]=="0"):
+                        retmsg += "\n"
+                        retmsg += msgformat.format(i[0],i[1],i[2],i[3], i[4])
+                    else:
+                        continue
+            elif(kata_kunci2[2]!="" and kata_kunci2[3]!=""):
+                dateawal = datetime.datetime.strptime(kata_kunci2[2], '%d/%m/%Y')
+                dateakhir = datetime.datetime.strptime(kata_kunci2[3], '%d/%m/%Y')
+                for i in db_reader:
+                    datedb = datetime.datetime.strptime(i[2], '%d/%m/%Y')
+                    if(kata_kunci1[0] == "deadline" and i[5]=="0" and dateawal <= datedb and dateakhir>= datedb):
+                        retmsg += "\n"
+                        retmsg += msgformat.format(i[0],i[1],i[2],i[3], i[4])
+                    elif(kata_kunci1[0] == i[3] and i[5]=="0" and dateawal <= datedb and dateakhir>= datedb):
+                        retmsg += "\n"
+                        retmsg += msgformat.format(i[0],i[1],i[2],i[3],i[4])
+                    else:
+                        continue
+            elif(kata_kunci2[4]!="" and kata_kunci2[5]!=""):
+                todaydate = datetime.datetime.strptime(today, '%d/%m/%Y')
+                movedate = todaydate
+                if(kata_kunci2[5] == "hari"):
+                    movedate = movedate + datetime.timedelta(days=int(kata_kunci2[4]))
+                else: # elif (kata_kunci1[5] == minggu)
+                    movedate = movedate + datetime.timedelta(weeks=int(kata_kunci2[4]))
+                for i in db_reader:
+                    datedb = datetime.datetime.strptime(i[2], '%d/%m/%Y')
+                    if(kata_kunci1[0] == "deadline" and i[5]=="0" and todaydate <= datedb and movedate>= datedb):
+                        retmsg += "\n"
+                        retmsg += msgformat.format(i[0],i[1],i[2],i[3], i[4])
+                    elif(kata_kunci1[0] == i[3] and i[5]=="0" and todaydate <= datedb and movedate>= datedb):
+                        retmsg += "\n"
+                        retmsg += msgformat.format(i[0],i[1],i[2],i[3],i[4])
+                    else:
+                        continue
             else:
-                return retmsg
+                pass
+            if (retmsg == "[Daftar Deadline]"): retmsg = "Tidak ditemukan task"
+            self.resMessage = retmsg
+            return True
 
 def handleMessage(message):
     c = CommandHandler(message)
@@ -93,7 +140,7 @@ def handleMessage(message):
 
 if __name__ == "__main__":
     #Untuk testing
-    reqMessage = "Apa yang bisa assistant bisa lakukan"
+    reqMessage = "apa saja deadline 3 hari ke depan?"
     resMessage = handleMessage(reqMessage)
     if(resMessage):
         print(resMessage)
