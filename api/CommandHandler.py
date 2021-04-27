@@ -36,8 +36,8 @@ class CommandHandler:
     
     def helpCmd(self):
         # Cari kata kunci "Assistant" dan "bisa"
-        k1 = re.search(r"Assistant", self.reqMessage)
-        k2 = re.search(r"bisa", self.reqMessage)
+        k1 = re.search(r"Assistant", self.reqMessage, flags=re.IGNORECASE)
+        k2 = re.search(r"bisa", self.reqMessage, flags=re.IGNORECASE)
         
         if(k1 and k2):
             resMsg = "[Fitur]\n1. Menambahkan task baru\n2. Melihat daftar task\n3. Menampilkan deadline dari suatu task tertentu\n4. Memperbaharui task tertentu\n5. Menandai suatu task telah selesai dikerjakan\n6. Menampilkan opsi help\n"
@@ -63,7 +63,7 @@ def handleMessage(message):
 
 if __name__ == "__main__":
     #Untuk testing
-    reqMessage = "Apa yang bisa Assistant bisa lakukan"
+    reqMessage = "Apa yang bisa assistant bisa lakukan"
     resMessage = handleMessage(reqMessage)
     if(resMessage):
         print(resMessage)
