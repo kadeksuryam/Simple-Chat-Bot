@@ -1,6 +1,8 @@
 import datetime
 import csv
 
+
+
 kata_penting = ["kuis", "ujian", "tucil", "tubes", "praktikum"]
 
 #Method untuk menambahkan task baru
@@ -50,26 +52,53 @@ def addTaskCmd(message):
 #Method untuk menandai suatu task selesai dikerjakan
 
 #Method untuk menampilkan opsi help (SURYA)
+def helpCmd():
+    # Cari kata kunci "Assistant" dan "bisa"
+    k1 = re.search(r"Assistant/i")
+    k2 = re.search(r"bisa/i")
+    
+    if(k1 and k2):
+        msg = "[Fitur]\n1. Menambahkan task baru\n2. Melihat daftar task\n3. Menampilkan deadline dari suatu task tertentu\n4. Memperbaharui task tertentu\n5. Menandai suatu task telah selesai dikerjakan\n6. Menampilkan opsi help"
+        msg += "\n[Daftar kata penting]\n"
+        
+        it_kata = 0
+        for kata in kata penting:
+            it_kata += 1
+            msg += str(it_kata) + ". " + kata + '\n'
+        
+        return msg, True
+
+    if(k1 and k2):
+        return "", False
 
 #Method bonus (SURYA)
 def checkTypo(message):
-    return "", True
+    return "", False
 
+def isAddTaskCmd(message):
+    deadline = re.findall(r"[0-9]{2}\/[0-9]{2}\/[0-9]{4}", message)
+    kode_matkul = re.findall(r"[A-Z]{2}[0-9]{4}", message)
+    
+
+def checkMessangeType(messange):
+    # Cek apakah penambahan task
+    
 
 
 def handleCommand(message):
     date = datetime.datetime.now()
-    suggestionMsg, statusTypo = checkTypo(message)
+    suggestionMsg, isMsgTypo = checkTypo(message)
     
-    if(statusTypo):
+    if(not(isMsgTypo)):
         msg, isAddTask = addTaskCmd(message) 
         if(isAddTask): return date, msg, []
         
     return date, "Maaf, pesan tidak dikenali", []
 
 
-
 if __name__ == "__main__":
-    msg, status = addTaskCmd("Halo bot, tolong ingetin kalau ada kuis IF3100 Bab 2 sampai 3 pada 22/04/2021")
-    if(status):
-        print(msg)
+    userMsg = "Halo bot, tolong ingetin kalau ada kuis IF3100 Bab 2 sampai 3 pada 22/04/2021"
+    msg, status = addTaskCmd(userMsg)
+    if(status): print(msg)
+    else:
+        if
