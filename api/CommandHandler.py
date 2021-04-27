@@ -87,6 +87,7 @@ def handleMessage(message):
     c = CommandHandler(message)
     c.addTaskCmd()
     c.helpCmd()
+    c.getTaskRecorded()
 
     return c.resMessage
 
