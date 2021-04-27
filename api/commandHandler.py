@@ -42,7 +42,36 @@ def addTaskCmd(message):
 
 
 #Method untuk menampilkan daftar task
-
+def getTaskRecorded(message,date):
+    msg = message.lower()
+    rkey = r"^(?=.*\bapa\b)"
+    key1 = ""
+    key1 += rkey +r"(?=.*\b({})\b).*".format("deadline") 
+    for i in kata_penting:
+        key1 += r"|"+ rkey + r"(?=.*\b({})\b).*".format(i)
+    key1 +=r"$"
+    kata_kunci1 = re.findall(key1,msg)
+    if (len(kata_kunci1)==0): return "",False
+    key2 = r"\b(hari ini)\b|\b(sejauh ini)\b|(\d{2}\/\d{2}\/\d{4})\b \w+ (\d{2}\/\d{2}\/\d{4}\b)|\b(\d+)\b \b(\w+)\b ke depan"
+    kata_kunci2 = re.findall(key2,msg)
+    if (len(kata_kunci2)==0): return "",False
+    kata_kunci1 = [x!="" for x in kata_kunci1]
+    with open('database.csv', 'r') as fileDB:
+        db_reader = csv.reader(fileDB, delimiter=',')
+        retmsg = "[{}]\n".format("Daftar Deadline")
+        if(kata_kunci2[0]!=""):
+            today = date.strftime("%d/%m/%Y")
+            for i in db_reader:
+                if(i[1] == today):
+                    retmsg += "(ID: {}) {} - {} - {}".format(i[0],i[1],i[2],i[3]) + "\n"               
+            return retmsg, True 
+        elif(kata_kunci2[1]!=""):
+            return retmsg
+        elif(kata_kunci2[2]!=""):
+            return retmsg
+        else:
+            return retmsg
+    # querykey =  
 #Method untuk menampilkan deadline (SURYA)
 
 #Method untuk memperbaharui task
@@ -64,7 +93,9 @@ def handleCommand(message):
     if(statusTypo):
         msg, isAddTask = addTaskCmd(message) 
         if(isAddTask): return date, msg, []
-        
+        msg, isGetTask = getTaskRecorded(message,date)
+        if(isGetTask): return date, msg, []
+        print(msg)
     return date, "Maaf, pesan tidak dikenali", []
 
 
