@@ -2,12 +2,6 @@ import datetime, re, csv, shutil
 from tempfile import NamedTemporaryFile
 
 class CommandHandler:
-    def initRegexKataPenting(self):
-        self.regex_kata_penting = r""
-        for i in range(0, len(self.kata_penting)): 
-            if(i < len(self.kata_penting)-1): self.regex_kata_penting += self.kata_penting[i] + "|"
-            else: self.regex_kata_penting += self.kata_penting[i]
-
     def __init__(self, message):
         self.reqMessage = message
         self.resMessage = ""
@@ -27,7 +21,7 @@ class CommandHandler:
             "ganti", "ubah", "diundur", "diganti", "diubah", "jadi" 
         ]
         self.fieldnames = ["id", "tgl_dibuat", "deadline", "jenis_task", "topik", "is_finished"]
-        self.initRegexKataPenting()
+
         
     def addTaskCmd(self):
         # Cari jenis task
