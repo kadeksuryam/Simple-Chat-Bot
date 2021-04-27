@@ -53,6 +53,14 @@ class CommandHandler:
         else:
             return False
 
+    def checkMsgTypo(self):
+        reqMsgSplit = self.reqMessage.split()
+        
+        for word in reqMsgSplit:
+            for kataPenting in self.kata_penting:
+                # tingkat kemiripan > 15%
+                if(self.levenshteinDistance(word, kata))
+
     def levenshteinDistance(self, src, dst):
         # Dynamic Programming, Bottom Up
         # d[i][j], adalah jarak levenshtein dengan prefix src ke i dan prefix dst ke j
