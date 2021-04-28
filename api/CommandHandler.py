@@ -237,7 +237,10 @@ class CommandHandler:
                         retmsg += msgformat.format(i[0],i[1],i[2],i[3],i[4])
                     else:
                         continue
-        
+            if(retmsg == "Daftar Deadline"):return False
+            self.resMessage = retmsg
+            return True
+            
     def getOneTaskDeadline(self):
         #cari kata deadline
         kw1 = re.findall(r"deadline", self.reqMessage, re.IGNORECASE)
@@ -260,6 +263,7 @@ class CommandHandler:
             else:
                 self.resMessage = deadline
 
+            
 def lastOccurence(string):
     loc = [-1 for i in range(128)]
     for i in range(len(string)):
