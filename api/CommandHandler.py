@@ -179,8 +179,9 @@ class CommandHandler:
         kata_kunci1 = [x for x in kata_kunci1[0] if x!=""]
         key2 = r"\b(hari ini)\b|\b(sejauh ini)\b|(\d{2}\/\d{2}\/\d{4})\b \w+ (\d{2}\/\d{2}\/\d{4}\b)|\b(\d+)\b \b(\w+)\b ke depan"
         kata_kunci2 = re.findall(key2,msg)
-        msgformat = "(ID: {}) {} - {} - {} - {} - {}"
-        retmsg = "[Daftar {}]".format(kata_kunci1[0])
+        msgformat = "{}. (ID: {}) {} - {} - {} - {}"
+        retmsg = "[Daftar {}]".format(kata_kunci1[0][0].upper()+kata_kunci1[0][1:])
+        num = 0;
         if (len(kata_kunci2)==0): 
             if(kata_kunci1[0]=="deadline"):
                 with open(path + 'database.csv', 'r') as fileDB:
@@ -188,8 +189,9 @@ class CommandHandler:
                     next(db_reader, None)
                     for i in db_reader:
                         if(i[6]=="0"):
-                            retmsg += "\n"
-                            retmsg += msgformat.format(i[0],i[1],i[2],i[3],i[4],i[5])
+                            num+=1
+                            retmsg += "\n\n"
+                            retmsg += msgformat.format(num,i[0],i[2],i[3],i[4],i[5])
                 if(retmsg == "Daftar Deadline"):return False
                 self.resMessage = retmsg
                 return True
@@ -202,21 +204,25 @@ class CommandHandler:
             if(kata_kunci2[0]!=""):
                 for i in db_reader:
                     if(i[2] == today and kata_kunci1[0] == "deadline" and i[6]=="0"):
-                        retmsg += "\n"
-                        retmsg += msgformat.format(i[0],i[1],i[2],i[3],i[4],i[5])
+                        num +=1
+                        retmsg += "\n\n"
+                        retmsg += msgformat.format(num,i[0],i[2],i[3],i[4],i[5])
                     elif(i[2] == today and kata_kunci1[0] == i[3] and i[6]=="0"):
-                        retmsg += "\n"
-                        retmsg += msgformat.format(i[0],i[1],i[2],i[3],i[4],i[5])
+                        num +=1
+                        retmsg += "\n\n"
+                        retmsg += msgformat.format(num,i[0],i[2],i[3],i[4],i[5])
                     else:
                         continue
             elif(kata_kunci2[1]!=""):
                 for i in db_reader:
                     if(kata_kunci1[0] == "deadline" and i[6]=="0"):
-                        retmsg += "\n"
-                        retmsg += msgformat.format(i[0],i[1],i[2],i[3],i[4],i[5])
+                        num +=1
+                        retmsg += "\n\n"
+                        retmsg += msgformat.format(num,i[0],i[2],i[3],i[4],i[5])
                     elif(kata_kunci1[0] == i[3] and i[6]=="0"):
-                        retmsg += "\n"
-                        retmsg += msgformat.format(i[0],i[1],i[2],i[3],i[4],i[5])
+                        num +=1
+                        retmsg += "\n\n"
+                        retmsg += msgformat.format(num,i[0],i[2],i[3],i[4],i[5])
                     else:
                         continue
             elif(kata_kunci2[2]!="" and kata_kunci2[3]!=""):
@@ -225,11 +231,13 @@ class CommandHandler:
                 for i in db_reader:
                     datedb = datetime.datetime.strptime(i[2], '%d/%m/%Y')
                     if(kata_kunci1[0] == "deadline" and i[6]=="0" and dateawal <= datedb and dateakhir>= datedb):
-                        retmsg += "\n"
-                        retmsg += msgformat.format(i[0],i[1],i[2],i[3],i[4],i[5])
+                        num+=1
+                        retmsg += "\n\n"
+                        retmsg += msgformat.format(num,i[0],i[2],i[3],i[4],i[5])
                     elif(kata_kunci1[0] == i[3] and i[6]=="0" and dateawal <= datedb and dateakhir>= datedb):
-                        retmsg += "\n"
-                        retmsg += msgformat.format(i[0],i[1],i[2],i[3],i[4],i[5])
+                        num+=1
+                        retmsg += "\n\n"
+                        retmsg += msgformat.format(num,i[0],i[2],i[3],i[4],i[5])
                     else:
                         continue
             elif(kata_kunci2[4]!="" and kata_kunci2[5]!=""):
@@ -242,15 +250,19 @@ class CommandHandler:
                 for i in db_reader:
                     datedb = datetime.datetime.strptime(i[2], '%d/%m/%Y')
                     if(kata_kunci1[0] == "deadline" and i[6]=="0" and todaydate <= datedb and movedate>= datedb):
-                        retmsg += "\n"
-                        retmsg += msgformat.format(i[0],i[1],i[2],i[3],i[4],i[5])
+                        num+= 1
+                        retmsg += "\n\n"
+                        retmsg += msgformat.format(num,i[0],i[2],i[3],i[4],i[5])
                     elif(kata_kunci1[0] == i[3] and i[6]=="0" and todaydate <= datedb and movedate>= datedb):
-                        retmsg += "\n"
-                        retmsg += msgformat.format(i[0],i[1],i[2],i[3],i[4],i[5])
+                        num +=1
+                        retmsg += "\n\n"
+                        retmsg += msgformat.format(num,i[0],i[2],i[3],i[4],i[5])
                     else:
                         continue
                     
-            if(retmsg == "Daftar Deadline"):return False
+            if(len(retmsg) <= 17):
+                self.resMessage = "Tidak ada"    
+                return False
             self.resMessage = retmsg
             return True
     
@@ -380,7 +392,7 @@ if __name__ == "__main__":
     #Untuk testing
     #reqMessage = "Apa yang bisa assistant bisa lakukan"
     #reqMessage = input()
-    resMessage = handleMessage("selesai mengerjakan task 1 asadasda sadkajasd?")
+    resMessage = handleMessage("apa saja deadline 3 hari ke depan")
     if(resMessage):
         print(resMessage)
     else:
