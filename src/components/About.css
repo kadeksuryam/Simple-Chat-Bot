@@ -1,0 +1,31 @@
+.about-container{
+    padding-top: 1rem;
+    padding-left: 1rem;
+}
+
+.dev-container{
+    display: flex;
+}
+
+.person{
+    padding-left: 1rem;
+}
+
+.title{
+    font-weight: 700;
+    font-size: 3rem;
+    padding-bottom: 10px;
+    text-shadow: 1px 1px 1px red,2px 2px 1px red;
+    padding-left: 0.5rem;
+}
+
+.dev-info{
+    padding: 10%;
+}
+
+.pfp{
+    width: 150px;
+    height: 200px;
+    border-radius: 1rem;
+    box-shadow: 0.3rem 0.5rem
+}

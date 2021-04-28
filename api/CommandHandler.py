@@ -129,8 +129,8 @@ class CommandHandler:
 
     def helpCmd(self):
         # Cari kata kunci "Assistant" dan "bisa"
-        k1 = re.search(r"Assistant", self.reqMessage, flags=re.IGNORECASE)
-        k2 = re.search(r"bisa", self.reqMessage, flags=re.IGNORECASE)
+        k1 = re.search(r"Assistant|asisten|bot|anda|Hayacaka", self.reqMessage, flags=re.IGNORECASE)
+        k2 = re.search(r"bisa|sabi|capable", self.reqMessage, flags=re.IGNORECASE)
         
         if(k1 and k2):
             resMsg = "\n[Fitur]\n1. Menambahkan task baru\n2. Melihat daftar task\n3. Menampilkan deadline dari suatu task tertentu\n4. Memperbaharui task tertentu\n5. Menandai suatu task telah selesai dikerjakan\n6. Menampilkan opsi help\n"
@@ -179,8 +179,9 @@ class CommandHandler:
         kata_kunci1 = [x for x in kata_kunci1[0] if x!=""]
         key2 = r"\b(hari ini)\b|\b(sejauh ini)\b|(\d{2}\/\d{2}\/\d{4})\b \w+ (\d{2}\/\d{2}\/\d{4}\b)|\b(\d+)\b \b(\w+)\b ke depan"
         kata_kunci2 = re.findall(key2,msg)
-        msgformat = "(ID: {}) {} - {} - {} - {} - {}"
-        retmsg = "[Daftar {}]".format(kata_kunci1[0])
+        msgformat = "{}. (ID: {}) {} - {} - {} - {}"
+        retmsg = "[Daftar {}]".format(kata_kunci1[0][0].upper()+kata_kunci1[0][1:])
+        num = 0;
         if (len(kata_kunci2)==0): 
             if(kata_kunci1[0]=="deadline"):
                 with open(path + 'database.csv', 'r') as fileDB:
@@ -188,8 +189,9 @@ class CommandHandler:
                     next(db_reader, None)
                     for i in db_reader:
                         if(i[6]=="0"):
-                            retmsg += "\n"
-                            retmsg += msgformat.format(i[0],i[1],i[2],i[3],i[4],i[5])
+                            num+=1
+                            retmsg += "\n\n"
+                            retmsg += msgformat.format(num,i[0],i[2],i[3],i[4],i[5])
                 if(retmsg == "Daftar Deadline"):return False
                 self.resMessage = retmsg
                 return True
@@ -202,21 +204,25 @@ class CommandHandler:
             if(kata_kunci2[0]!=""):
                 for i in db_reader:
                     if(i[2] == today and kata_kunci1[0] == "deadline" and i[6]=="0"):
-                        retmsg += "\n"
-                        retmsg += msgformat.format(i[0],i[1],i[2],i[3],i[4],i[5])
+                        num +=1
+                        retmsg += "\n\n"
+                        retmsg += msgformat.format(num,i[0],i[2],i[3],i[4],i[5])
                     elif(i[2] == today and kata_kunci1[0] == i[3] and i[6]=="0"):
-                        retmsg += "\n"
-                        retmsg += msgformat.format(i[0],i[1],i[2],i[3],i[4],i[5])
+                        num +=1
+                        retmsg += "\n\n"
+                        retmsg += msgformat.format(num,i[0],i[2],i[3],i[4],i[5])
                     else:
                         continue
             elif(kata_kunci2[1]!=""):
                 for i in db_reader:
                     if(kata_kunci1[0] == "deadline" and i[6]=="0"):
-                        retmsg += "\n"
-                        retmsg += msgformat.format(i[0],i[1],i[2],i[3],i[4],i[5])
+                        num +=1
+                        retmsg += "\n\n"
+                        retmsg += msgformat.format(num,i[0],i[2],i[3],i[4],i[5])
                     elif(kata_kunci1[0] == i[3] and i[6]=="0"):
-                        retmsg += "\n"
-                        retmsg += msgformat.format(i[0],i[1],i[2],i[3],i[4],i[5])
+                        num +=1
+                        retmsg += "\n\n"
+                        retmsg += msgformat.format(num,i[0],i[2],i[3],i[4],i[5])
                     else:
                         continue
             elif(kata_kunci2[2]!="" and kata_kunci2[3]!=""):
@@ -225,11 +231,13 @@ class CommandHandler:
                 for i in db_reader:
                     datedb = datetime.datetime.strptime(i[2], '%d/%m/%Y')
                     if(kata_kunci1[0] == "deadline" and i[6]=="0" and dateawal <= datedb and dateakhir>= datedb):
-                        retmsg += "\n"
-                        retmsg += msgformat.format(i[0],i[1],i[2],i[3],i[4],i[5])
+                        num+=1
+                        retmsg += "\n\n"
+                        retmsg += msgformat.format(num,i[0],i[2],i[3],i[4],i[5])
                     elif(kata_kunci1[0] == i[3] and i[6]=="0" and dateawal <= datedb and dateakhir>= datedb):
-                        retmsg += "\n"
-                        retmsg += msgformat.format(i[0],i[1],i[2],i[3],i[4],i[5])
+                        num+=1
+                        retmsg += "\n\n"
+                        retmsg += msgformat.format(num,i[0],i[2],i[3],i[4],i[5])
                     else:
                         continue
             elif(kata_kunci2[4]!="" and kata_kunci2[5]!=""):
@@ -242,15 +250,19 @@ class CommandHandler:
                 for i in db_reader:
                     datedb = datetime.datetime.strptime(i[2], '%d/%m/%Y')
                     if(kata_kunci1[0] == "deadline" and i[6]=="0" and todaydate <= datedb and movedate>= datedb):
-                        retmsg += "\n"
-                        retmsg += msgformat.format(i[0],i[1],i[2],i[3],i[4],i[5])
+                        num+= 1
+                        retmsg += "\n\n"
+                        retmsg += msgformat.format(num,i[0],i[2],i[3],i[4],i[5])
                     elif(kata_kunci1[0] == i[3] and i[6]=="0" and todaydate <= datedb and movedate>= datedb):
-                        retmsg += "\n"
-                        retmsg += msgformat.format(i[0],i[1],i[2],i[3],i[4],i[5])
+                        num +=1
+                        retmsg += "\n\n"
+                        retmsg += msgformat.format(num,i[0],i[2],i[3],i[4],i[5])
                     else:
                         continue
                     
-            if(retmsg == "Daftar Deadline"):return False
+            if(len(retmsg) <= 17):
+                self.resMessage = "Tidak ada"    
+                return False
             self.resMessage = retmsg
             return True
     
@@ -280,17 +292,17 @@ class CommandHandler:
         #using bm
         msg = self.reqMessage.lower()
         bmid = boyerMooreMatch(msg,"selesai mengerjakan task")
-        sukses = False
+        msgregex=re.findall(r"^(?=.*\bselesai\b).*$",msg)
         if (bmid != -1):
             numberid = re.findall(r"(\d+)", msg[bmid:])
             sukses = changeCompletionDB(numberid)
-
-            if (sukses):
-                self.resMessage = "Sukses merubah status task menjadi completed"
-                return True
-            else:
-                self.resMessage ="id tidak ditemukan"
-                return False
+            self.resMessage = "Sukses merubah status task menjadi completed" if (sukses) else "Id tidak ditemukan"
+            return True
+        #using regex
+        elif (len(msgregex)!=0):
+            numberid = re.findall(r"(\d+)", msgregex[0])
+            sukses = changeCompletionDB(numberid)
+            self.resMessage = "Sukses merubah status task menjadi completed" if (sukses) else "Id tidak ditemukan"
         
 
 def changeCompletionDB(listofnum):
@@ -372,13 +384,15 @@ def handleMessage(message):
     c.taksIsCompleted()
     c.getTaskRecorded()
     c.getOneTaskDeadline()
+    if (not c.typoWord and not c.resMessage):
+        c.resMessage = "Maaf, pesan tidak dikenali"
     return datetime.datetime.now(), c.resMessage, c.typoWord
 
 if __name__ == "__main__":
     #Untuk testing
     #reqMessage = "Apa yang bisa assistant bisa lakukan"
     #reqMessage = input()
-    resMessage = handleMessage("selesai mengerjakan task 1 asadasda sadkajasd?")
+    resMessage = handleMessage("apa saja deadline 3 hari ke depan")
     if(resMessage):
         print(resMessage)
     else:
