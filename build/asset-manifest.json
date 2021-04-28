@@ -1,0 +1,26 @@
+{
+  "files": {
+    "main.css": "/static/css/main.cd774340.chunk.css",
+    "main.js": "/static/js/main.51d27e61.chunk.js",
+    "main.js.map": "/static/js/main.51d27e61.chunk.js.map",
+    "runtime-main.js": "/static/js/runtime-main.897aa51e.js",
+    "runtime-main.js.map": "/static/js/runtime-main.897aa51e.js.map",
+    "static/css/2.3d6317e8.chunk.css": "/static/css/2.3d6317e8.chunk.css",
+    "static/js/2.f5c50d3d.chunk.js": "/static/js/2.f5c50d3d.chunk.js",
+    "static/js/2.f5c50d3d.chunk.js.map": "/static/js/2.f5c50d3d.chunk.js.map",
+    "index.html": "/index.html",
+    "static/css/2.3d6317e8.chunk.css.map": "/static/css/2.3d6317e8.chunk.css.map",
+    "static/css/main.cd774340.chunk.css.map": "/static/css/main.cd774340.chunk.css.map",
+    "static/js/2.f5c50d3d.chunk.js.LICENSE.txt": "/static/js/2.f5c50d3d.chunk.js.LICENSE.txt",
+    "static/media/akeyla.4672a057.jpg": "/static/media/akeyla.4672a057.jpg",
+    "static/media/surya-img.6263a084.jpg": "/static/media/surya-img.6263a084.jpg",
+    "static/media/zaidan-img.ad7bc4a9.png": "/static/media/zaidan-img.ad7bc4a9.png"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.897aa51e.js",
+    "static/css/2.3d6317e8.chunk.css",
+    "static/js/2.f5c50d3d.chunk.js",
+    "static/css/main.cd774340.chunk.css",
+    "static/js/main.51d27e61.chunk.js"
+  ]
+}
