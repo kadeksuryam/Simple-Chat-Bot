@@ -129,8 +129,8 @@ class CommandHandler:
 
     def helpCmd(self):
         # Cari kata kunci "Assistant" dan "bisa"
-        k1 = re.search(r"Assistant", self.reqMessage, flags=re.IGNORECASE)
-        k2 = re.search(r"bisa", self.reqMessage, flags=re.IGNORECASE)
+        k1 = re.search(r"Assistant|asisten|bot|anda|Hayacaka", self.reqMessage, flags=re.IGNORECASE)
+        k2 = re.search(r"bisa|sabi|capable", self.reqMessage, flags=re.IGNORECASE)
         
         if(k1 and k2):
             resMsg = "\n[Fitur]\n1. Menambahkan task baru\n2. Melihat daftar task\n3. Menampilkan deadline dari suatu task tertentu\n4. Memperbaharui task tertentu\n5. Menandai suatu task telah selesai dikerjakan\n6. Menampilkan opsi help\n"
