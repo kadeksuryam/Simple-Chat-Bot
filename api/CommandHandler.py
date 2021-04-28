@@ -232,7 +232,11 @@ class CommandHandler:
                         retmsg += msgformat.format(i[0],i[1],i[2],i[3],i[4])
                     else:
                         continue
+            if(retmsg == "Daftar Deadline"):return False
+            self.resMessage = retmsg
+            return True
 
+            
 def lastOccurence(string):
     loc = [-1 for i in range(128)]
     for i in range(len(string)):
