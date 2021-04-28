@@ -183,7 +183,7 @@ class CommandHandler:
         retmsg = "[Daftar {}]".format(kata_kunci1[0])
         if (len(kata_kunci2)==0): 
             if(kata_kunci1[0]=="deadline"):
-                with open('database.csv', 'r') as fileDB:
+                with open(path + 'database.csv', 'r') as fileDB:
                     db_reader = csv.reader(fileDB, delimiter=',')
                     next(db_reader, None)
                     for i in db_reader:
@@ -280,25 +280,23 @@ class CommandHandler:
         #using bm
         msg = self.reqMessage.lower()
         bmid = boyerMooreMatch(msg,"selesai mengerjakan task")
-        msgregex=re.findall(r"^(?=.*\bselesai\b).*$",msg)
+        sukses = False
         if (bmid != -1):
             numberid = re.findall(r"(\d+)", msg[bmid:])
             sukses = changeCompletionDB(numberid)
-            self.resMessage = "Sukses merubah status task menjadi completed" if (sukses) else "Id tidak ditemukan"
-            return True
-        #using regex
-        elif (len(msgregex)!=0):
-            numberid = re.findall(r"(\d+)", msgregex[0])
-            sukses = changeCompletionDB(numberid)
-            self.resMessage = "Sukses merubah status task menjadi completed" if (sukses) else "Id tidak ditemukan"
-            return True
-        else:
-            return False
+
+            if (sukses):
+                self.resMessage = "Sukses merubah status task menjadi completed"
+                return True
+            else:
+                self.resMessage ="id tidak ditemukan"
+                return False
+        
 
 def changeCompletionDB(listofnum):
     writemsg = []
     change = False
-    with open('database.csv', 'r') as fileDB:
+    with open(path + 'database.csv', 'r') as fileDB:
         db_reader = csv.reader(fileDB, delimiter=',')
         for i in db_reader:
             if(i[0] in listofnum):
@@ -308,7 +306,7 @@ def changeCompletionDB(listofnum):
             else:
                 writemsg.append(i)
     if(len(writemsg)!=0):
-        with open('database.csv', 'w') as fileDB:
+        with open(path + 'database.csv', 'w') as fileDB:
             db_writer = csv.writer(fileDB, delimiter=',')
             for i in writemsg:
                 db_writer.writerow([i[0],i[1],i[2],i[3],i[4],i[5],i[6]])
@@ -382,7 +380,7 @@ if __name__ == "__main__":
     #Untuk testing
     #reqMessage = "Apa yang bisa assistant bisa lakukan"
     #reqMessage = input()
-    resMessage = handleMessage("apa saja deadline hingga hari?")
+    resMessage = handleMessage("selesai mengerjakan task 1 asadasda sadkajasd?")
     if(resMessage):
         print(resMessage)
     else:
