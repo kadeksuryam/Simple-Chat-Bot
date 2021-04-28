@@ -280,18 +280,19 @@ class CommandHandler:
         #using bm
         msg = self.reqMessage.lower()
         bmid = boyerMooreMatch(msg,"selesai mengerjakan task")
+        msgregex=re.findall(r"^(?=.*\bselesai\b).*$",msg)
         if (bmid != -1):
             numberid = re.findall(r"(\d+)", msg[bmid:])
             sukses = changeCompletionDB(numberid)
+            self.resMessage = "Sukses merubah status task menjadi completed" if (sukses) else "Id tidak ditemukan"
+            return True
         #using regex
-        else:
-            pass
-        
-        if (sukses):
-            self.resMessage = "Sukses merubah status task menjadi completed"
+        elif (len(msgregex)!=0):
+            numberid = re.findall(r"(\d+)", msgregex[0])
+            sukses = changeCompletionDB(numberid)
+            self.resMessage = "Sukses merubah status task menjadi completed" if (sukses) else "Id tidak ditemukan"
             return True
         else:
-            self.resMessage ="id tidak ditemukan"
             return False
 
 def changeCompletionDB(listofnum):
@@ -379,7 +380,7 @@ if __name__ == "__main__":
     #Untuk testing
     #reqMessage = "Apa yang bisa assistant bisa lakukan"
     #reqMessage = input()
-    resMessage = handleMessage("selesai mengerjakan task 1 asadasda sadkajasd?")
+    resMessage = handleMessage("apa saja deadline hingga hari?")
     if(resMessage):
         print(resMessage)
     else:
