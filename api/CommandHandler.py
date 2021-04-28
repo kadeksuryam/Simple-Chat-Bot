@@ -374,6 +374,8 @@ def handleMessage(message):
     c.taksIsCompleted()
     c.getTaskRecorded()
     c.getOneTaskDeadline()
+    if (not c.typoWord and not c.resMessage):
+        c.resMessage = "Maaf, pesan tidak dikenali"
     return datetime.datetime.now(), c.resMessage, c.typoWord
 
 if __name__ == "__main__":
