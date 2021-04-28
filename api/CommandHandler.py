@@ -1,9 +1,9 @@
 import datetime, re, csv, shutil
 from tempfile import NamedTemporaryFile
 import sys, os.path
-dir_cmd = (os.path.abspath(os.path.join(os.path.dirname(__file__), '')))
-sys.path.append(dir_cmd)
-
+full_path = os.path.realpath(__file__)
+path, filename = os.path.split(full_path)
+path += '/'
 class CommandHandler:
     def __init__(self, message):
         self.reqMessage = message
@@ -66,11 +66,11 @@ class CommandHandler:
             
             if(deadline and kode_matkul and jenis_task and topik):
                 #tambahkan task ke database
-                with open('database.csv', 'r', newline='') as fileDB:
+                with open(path + 'database.csv', 'r', newline='') as fileDB:
                     db_reader = csv.reader(fileDB, delimiter=',')
                     nRows = sum(1 for row in db_reader)
 
-                with open('database.csv', 'a', newline='') as fileDB:
+                with open(path + 'database.csv', 'a', newline='') as fileDB:
                     db_writer = csv.writer(fileDB, delimiter=',')
                     db_writer.writerow([nRows, datetime.datetime.now().strftime("%d/%m/%Y"), deadline[0].strftime("%d/%m/%Y"), jenis_task[0], kode_matkul[0], topik[0], 0])
                 self.resMessage = f"[TASK BERHASIL DICATAT]\n(ID: {nRows}) - " + deadline[0].strftime("%d/%m/%Y") + f"- {jenis_task[0]} - {kode_matkul[0]} - {topik[0]}"
@@ -109,7 +109,7 @@ class CommandHandler:
                 jenis_task = 0
                 found = False
                 tempfile = NamedTemporaryFile(mode="w", delete=False, newline="")
-                with open('database.csv', 'r', newline='') as csvfile, tempfile:
+                with open(path + 'database.csv', 'r', newline='') as csvfile, tempfile:
                     reader = csv.DictReader(csvfile, fieldnames = self.fieldnames)
                     writer = csv.DictWriter(tempfile, fieldnames = self.fieldnames)
                     for row in reader:
@@ -195,7 +195,7 @@ class CommandHandler:
                 return True
             else:   return "",False
         kata_kunci2 = kata_kunci2[0]
-        with open('database.csv', 'r') as fileDB:
+        with open(path + 'database.csv', 'r') as fileDB:
             db_reader = csv.reader(fileDB, delimiter=',')
             next(db_reader, None)
             today = datetime.datetime.now().strftime("%d/%m/%Y")
@@ -265,7 +265,7 @@ class CommandHandler:
         if(kw1 and kw2 and kw3):
             #cari di database
             deadline = ""
-            with open('database.csv', 'r', newline='') as fileDB:
+            with open(path + 'database.csv', 'r', newline='') as fileDB:
                 db_reader = csv.DictReader(fileDB, fieldnames = self.fieldnames)
                 for row in db_reader:
                     if(row["jenis_task"].lower() == kw2[0] and row["kode_matkul"] == kw3[0]):
