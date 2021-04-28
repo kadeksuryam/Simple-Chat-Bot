@@ -1,5 +1,8 @@
 import datetime, re, csv, shutil
 from tempfile import NamedTemporaryFile
+import sys, os.path
+dir_cmd = (os.path.abspath(os.path.join(os.path.dirname(__file__), '')))
+sys.path.append(dir_cmd)
 
 class CommandHandler:
     def __init__(self, message):
@@ -8,6 +11,9 @@ class CommandHandler:
         self.kata_penting = [
         "kuis", "ujian", "tucil", "tubes", "praktikum",
          "uts", "uas", "pr", "tugas", "milestone"
+        ]
+        self.kata_tugas = [
+            "tucil", "tubes", "tugas", "pr", "milestone"
         ]
         self.kata_petunjuk_waktu = [
             "pada", "buat", "pas", "tanggal", "dikumpul", "deadline"
@@ -20,7 +26,7 @@ class CommandHandler:
         self.kata_perbarui = [
             "ganti", "ubah", "diundur", "diganti", "diubah", "jadi" 
         ]
-        self.fieldnames = ["id", "tgl_dibuat", "deadline", "jenis_task", "topik", "is_finished"]
+        self.fieldnames = ["id", "tgl_dibuat", "deadline", "jenis_task","kode_matkul", "topik", "is_finished"]
 
         
     def addTaskCmd(self):
@@ -57,7 +63,7 @@ class CommandHandler:
                     if(matchIndex > -1):
                         katatopik = katatopik[0:matchIndex] + katatopik[matchIndex + len(katawaktu) + 1:] 
                 topik[0] = katatopik
-
+            
             if(deadline and kode_matkul and jenis_task and topik):
                 #tambahkan task ke database
                 with open('database.csv', 'r', newline='') as fileDB:
@@ -66,8 +72,8 @@ class CommandHandler:
 
                 with open('database.csv', 'a', newline='') as fileDB:
                     db_writer = csv.writer(fileDB, delimiter=',')
-                    db_writer.writerow([nRows, datetime.datetime.now().strftime("%d/%m/%Y"), deadline[0].strftime("%d/%m/%Y"), jenis_task[0], topik[0], 0])
-                self.resMessage = f"[TASK BERHASIL DICATAT]\n(ID: {nRows}) - " + deadline[0].strftime("%d/%m/%Y") + f"- {jenis_task[0]} - {topik[0]}"
+                    db_writer.writerow([nRows, datetime.datetime.now().strftime("%d/%m/%Y"), deadline[0].strftime("%d/%m/%Y"), jenis_task[0], kode_matkul[0], topik[0], 0])
+                self.resMessage = f"[TASK BERHASIL DICATAT]\n(ID: {nRows}) - " + deadline[0].strftime("%d/%m/%Y") + f"- {jenis_task[0]} - {kode_matkul[0]} - {topik[0]}"
                 return True
             else:
                 return False
@@ -113,7 +119,7 @@ class CommandHandler:
                             topik = row["topik"]
                             jenis_task = row["jenis_task"]
                         writer.writerow({"id": row["id"], "tgl_dibuat": row["tgl_dibuat"],"deadline": row["deadline"],
-                        "jenis_task": row["jenis_task"],"topik": row["topik"],"is_finished": row["is_finished"]})
+                        "jenis_task": row["jenis_task"],"topik": row["topik"],"kode_matkul" : row["kode_matkul"], "is_finished": row["is_finished"]})
                 shutil.move(tempfile.name, "database.csv")
                 if(found):
                     self.resMessage = f"[TASK BERHASIL DIUBAH]\n(ID: {noTask[0]}) - " + deadline[0].strftime("%d/%m/%Y") + f"- {jenis_task} - {topik}"
@@ -151,7 +157,6 @@ class CommandHandler:
                     reqMsgSplit_i_len = len(reqMsgSplit[i])
 
                     kemiripan = max(0, 1-levenshteinDistance(reqMsgSplit[i], keyword)/(max(reqMsgSplit_i_len, kataPenting_len)))
-                    print(keyword)
                     if(kemiripan*100 > 75 and kemiripan != 1):
                         reqMsgSplit[i] = keyword
                         typoWord.append(keyword)
@@ -232,6 +237,28 @@ class CommandHandler:
                         retmsg += msgformat.format(i[0],i[1],i[2],i[3],i[4])
                     else:
                         continue
+        
+    def getOneTaskDeadline(self):
+        #cari kata deadline
+        kw1 = re.findall(r"deadline", self.reqMessage, re.IGNORECASE)
+        #cari kemunculan kata tugas
+        kw2 = re.findall(r"|".join(self.kata_tugas), self.reqMessage, re.IGNORECASE)
+        #cari kode matakuliah
+        kw3 = re.findall(r"[A-Z]{2}[0-9]{4}", self.reqMessage, re.IGNORECASE)
+
+        if(kw1 and kw2 and kw3):
+            #cari di database
+            deadline = ""
+            with open('database.csv', 'r', newline='') as fileDB:
+                db_reader = csv.DictReader(fileDB, fieldnames = self.fieldnames)
+                for row in db_reader:
+                    if(row["jenis_task"].lower() == kw2[0] and row["kode_matkul"] == kw3[0]):
+                        deadline = row["deadline"]
+
+            if(deadline == ""): 
+                self.resMessage = "Deadline task terkait tidak ditemukan"
+            else:
+                self.resMessage = deadline
 
 def lastOccurence(string):
     loc = [-1 for i in range(128)]
@@ -290,13 +317,14 @@ def handleMessage(message):
     c.helpCmd()
     c.renewTask()
     c.getTaskRecorded()
+    c.getOneTaskDeadline()
     return datetime.datetime.now(), c.resMessage, c.typoWord
 
 if __name__ == "__main__":
     #Untuk testing
     #reqMessage = "Apa yang bisa assistant bisa lakukan"
-    reqMessage = input()
-    resMessage = handleMessage(reqMessage)
+    #reqMessage = input()
+    resMessage = handleMessage("Halo bot, deadline tubes IF3010 itu kapan?")
     if(resMessage):
         print(resMessage)
     else:
